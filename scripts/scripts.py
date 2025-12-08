@@ -9,3 +9,5 @@ print(obs)
 
 df_recode = df.assign(sexe = df["QSEXE"].map({"Femme": 0, "Homme": 1}))
 df_recode = df.assign(tranche_age = df["RAGE2"].map({"De15a24ans": 1, "De25a34ans1": 2, "De35a49ans1": 3, "De50a64ans1": 4, "De65aPlus": 5}))
+
+print(df_recode[["sexe"]])
