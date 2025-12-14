@@ -23,7 +23,7 @@ print(f"Nombre d'observations : {obs}")
 
 variables = [
     "SEXE", "AGE", "AGGLOIFOP2", "TYPCOM", "TAILCOM", "DPT", "REG3", "REG13", 
-    "SITI", "PPIA", "RECPPIA", "STCA", "FOYER", 
+    "SITI", "PPIA", "RECPPIA", "STCA", "STATUT", "FOYER", 
     #Q1 quel produit avez-vous consommé de manière dématérialisée ces 12 derniers mois ?
     "Q1_1", "Q1_2", "Q1_3", "Q1_4", "Q1_5", "Q1_6", "Q1_7", "Q1_8", "Q1_9", "Q1_10", "Q1_11", 
     #Q2 : à quelle fréquence ?
@@ -32,7 +32,7 @@ variables = [
     "Q2BIS",
     #Q3 : consommation légale ? (globalité)
     "Q3",
-    #Q5 : consommation légale ? globalité dans le cadre des activités proposées question1
+    #Q4 : consommation légale ? globalité dans le cadre des activités proposées question1
     "Q4",
     #Q5_r : consommation légale pour chaque activité
     "Q5_r1", "Q5_r2", "Q5_r3", "Q5_r4", "Q5_r5", "Q5_r6", "Q5_r7", "Q5_r8", "Q5_r9", "Q5_r10", "Q5_r11", 
@@ -81,6 +81,17 @@ df["profession"] = df_cleaned["PPIA"]
 
 df["csp"] = df_cleaned["RECPPIA"]
 
+df["statut"] = df_cleaned["STATUT"]
 
+df["foyer"] = df_cleaned["FOYER"]
+
+df[["conso_demat_mus", "conso_demat_films", "conso_demat_series", "conso_demat_photos", "conso_demat_jv", "conso_demat_livres", "conso_demat_logi", "conso_demat_presse", "conso_demat_retrans", "conso_demat_autre"]] = df_cleaned[["Q1_1", "Q1_2", "Q1_3", "Q1_4", "Q1_5", "Q1_6", "Q1_7", "Q1_8", "Q1_9", "Q1_10"]]
+
+df[["freq_demat_mus", "freq_demat_films", "freq_demat_series", "freq_demat_photos", "freq_demat_jv", "freq_demat_livres", "freq_demat_logi", "freq_demat_presse", "freq_demat_retrans", "freq_demat_autres"]] = df_cleaned[["Q2_r1", "Q2_r2", "Q2_r3", "Q2_r4", "Q2_r5", "Q2_r6", "Q2_r7", "Q2_r8", "Q2_r9", "Q2_r10"]]
+
+legal_map = {"Exclusivement de façon légale" : 1, "Exclusivement de façon illégale":0, "Les deux, légalement et illégalement":0.5}
+df["legal"] = df_cleaned["Q3"].map(legal_map)
+
+df["legal_culture"] = df_cleaned["Q4"]
 
 print(df.head())
