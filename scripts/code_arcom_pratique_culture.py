@@ -95,3 +95,25 @@ df["legal"] = df_cleaned["Q3"].map(legal_map)
 df["legal_culture"] = df_cleaned["Q4"]
 
 print(df.head())
+
+# Verif donnees manquantes
+# -------------------------------
+print("\nValeurs manquantes par colonne :")
+print(df.isna().sum().to_string())
+
+print("\nPourcentage de valeurs manquantes :")
+print((df.isna().mean() * 100).to_string())
+
+# -------------------------------
+# Statistiques descriptives
+# -------------------------------
+print("\n--- Variables numériques ---")
+print(df.describe(include="number").T)
+
+print("\n--- Variables catégorielles ---")
+categorical_cols = df.select_dtypes(include="object").columns.tolist()
+for col in categorical_cols:
+    print(f"\nVariable : {col}")
+    counts = df[col].value_counts(dropna=False)
+    percentages = df[col].value_counts(normalize=True, dropna=False) * 100
+    print(pd.concat([counts, percentages], axis=1, keys=["count", "percent"]))
