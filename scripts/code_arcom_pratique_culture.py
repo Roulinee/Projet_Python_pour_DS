@@ -1,6 +1,8 @@
 import requests
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 # -------------------------------
 # Téléchargement du fichier
@@ -117,3 +119,6 @@ for col in categorical_cols:
     counts = df[col].value_counts(dropna=False)
     percentages = df[col].value_counts(normalize=True, dropna=False) * 100
     print(pd.concat([counts, percentages], axis=1, keys=["count", "percent"]))
+
+
+
