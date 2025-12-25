@@ -1,9 +1,11 @@
 import requests
 import pandas as pd
 import numpy as np
+import statsmodels.api as sm
 from prince import MCA
 from sklearn.cluster import KMeans
-import statsmodels.api as sm
+from plotnine import *
+
 
 
 # ___________________________________________________
@@ -154,8 +156,6 @@ for col in categorical_cols:
     print(pd.concat([counts, percentages], axis=1, keys=["count", "percent"]))
 
 
-# 
-#
 
 # ____________________________________________________
 # VARIABLES BINAIRES DE PRATIQUES (ACTIVES POUR ACM)
@@ -197,16 +197,57 @@ coords = mca_fit.transform(df[acm_vars])
 
 
 
-#clustering
+# clustering
 
-# Choisir les axes (ex : 1 à 4)
+# Choisir les axes de l'ACM
+# .
+# .
+# /!\ IL FAUDRA RETENIR LE NOMBRE D AXES SELON L INERTIE EXPLIQUEE
+# .
+# .
+
 X = coords.iloc[:, :4]
 
 kmeans = KMeans(n_clusters=4, random_state=42)
 df["classe"] = kmeans.fit_predict(X)
 
+# pour afficher les coordonnées des centroides
+centroids = pd.DataFrame(
+    kmeans.cluster_centers_,
+    columns=["Dim_1", "Dim_2", "Dim_3", "Dim_4"]
+)
+centroids["classe"] = centroids.index.astype(str)
+
+# df pour la visualisation des clusters
+plot_df = coords.copy()
 
 
+plot_df.columns = [f"Dim_{i+1}" for i in range(plot_df.shape[1])]
+plot_df["classe"] = df["classe"].astype("category")
+
+
+p = (
+    ggplot(plot_df) +
+    geom_point(
+        aes(x="Dim_1", y="Dim_2", color="classe"),
+        alpha=0.35
+    ) +
+    geom_point(
+        data=centroids,
+        mapping=aes(x="Dim_1", y="Dim_2"),
+        color="black",
+        size=4,
+        shape="X"
+    ) +
+    theme_bw() +
+    labs(
+        title="Clusters K-means projetés sur l'ACM",
+        x="Dimension 1",
+        y="Dimension 2"
+    )
+)
+
+print(p)
 
 
 
@@ -227,13 +268,13 @@ df["classe"] = kmeans.fit_predict(X)
 
 
 
-#regression par classe du clustering
-for c in df["classe"].unique():
-    sub = df[df["classe"] == c]
-    model = sm.OLS(
-        sub["score_omnivorisme"],
-        sm.add_constant(sub[["age_cat", "sexe", "agglo"]]),
-        missing="drop"
-    ).fit()
-    print(f"\nClasse {c}")
-    print(model.summary())
+# regression par classe du clustering
+#for c in df["classe"].unique():
+#    sub = df[df["classe"] == c]
+#    model = sm.OLS(
+#        sub["score_omnivorisme"],
+#        sm.add_constant(sub[["age_cat", "sexe", "agglo"]]),
+#        missing="drop"
+#    ).fit()
+#    print(f"\nClasse {c}")
+#    print(model.summary())
