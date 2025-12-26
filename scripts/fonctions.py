@@ -1,5 +1,7 @@
 import requests
 import pandas as pd
+import numpy as np
+
 
 def telecharger(url, nom):
     """"
@@ -15,7 +17,12 @@ def telecharger(url, nom):
     else:
         print("Erreur :", response.status_code)
 
-def analyse(df):
+
+def analyser(df):
+    """
+    Résume le data frame en entrée
+    df (DataFrame) : data frame à résumer
+    """
     n_obs, n_var = df.shape
 
     n_num = df.select_dtypes(include="number").shape[1]
