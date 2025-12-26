@@ -35,7 +35,7 @@ def analyser(df):
     n_const = (df.nunique(dropna=False) <= 1).sum()
 
     phrase = (
-        f"La base de données {df} contient {n_obs} observations et {n_var} variables. "
+        f"La base de données contient {n_obs} observations et {n_var} variables. "
         f"Elle comprend {n_num} variables numériques, {n_txt} variables de type texte, "
         f"On observe {n_missing} valeurs manquantes, soit {pct_missing}% de l’ensemble des cellules, "
         f"réparties sur {n_var_missing} variables. "
