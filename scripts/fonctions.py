@@ -43,3 +43,10 @@ def analyser(df):
     )
 
     return phrase
+
+
+def ponderation_freq(series, weights):
+    return (series
+            .groupby(series)
+            .apply(lambda x: weights.loc[x.index].sum())
+            / weights.sum()) * 100
