@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 
-def telecharger(url, nom, dossier="/home/onyxia/work/Projet_Python_pour_DS/data"):
+def telecharger(url, nom, dossier):
     """"
     Importe le fichier de données sur le site
     url (str) : url du fichier que l'on souhaite télécharger
@@ -38,11 +38,11 @@ def analyser(df):
     n_const = (df.nunique(dropna=False) <= 1).sum()
 
     phrase = (
-        f"La base de données contient {n_obs} observations et {n_var} variables. "
-        f"Elle comprend {n_num} variables numériques, {n_txt} variables de type texte, "
-        f"On observe {n_missing} valeurs manquantes, soit {pct_missing}% de l’ensemble des cellules, "
-        f"réparties sur {n_var_missing} variables. "
-        f"Enfin, {n_const} variables sont constantes."
+        f"La base de données contient {n_obs} observations et {n_var} variables. \n"
+        f"Elle comprend {n_num} variables numériques, {n_txt} variables de type texte, \n"
+        f"On observe {n_missing} valeurs manquantes, soit {pct_missing}% de l’ensemble des cellules, \n"
+        f"réparties sur {n_var_missing} variables. \n"
+        f"Enfin, {n_const} variables sont constantes. "
     )
 
     return phrase
@@ -55,7 +55,12 @@ def ponderation_freq(series, weights):
             / weights.sum()) * 100
 
 
-def recodage_barometre():
+def recodage_barometre(df_barometre_brut, variables_barometre):
+    """
+    Recode les données du baromètre
+    df_barometre_brut (DataFrame) : dataframe issu du téléchargement
+    variables_barometre (List) : liste de variables
+    """
     df_barometre_cleaned = df_barometre_brut[variables_barometre]
 
     df_barometre_cleaned.replace({"#NUL!": np.nan, "": np.nan, " ": np.nan}, inplace=True)
@@ -179,6 +184,110 @@ def recodage_barometre():
         df_barometre_cleaned["Q4"].isin(mix_legal)
     ).astype(int)
 
-
-
     print(df_barometre_recode.head())
+    return df_barometre_recode
+
+
+def recodage_musique(df_musique_brut, variables_musique):
+    """
+    Recode les données des pratiques d'écoute de musique en ligne
+    df_musique_brut (DataFrame) : dataframe issu du téléchargement
+    variables_musique (List) : liste de variables
+    """
+    pratiques = ["mus","films","series","photos","jv","livres","logi","presse","retrans"]
+    mode_acces_musique = ["internet", "applications", "CD", "vinyles", "concert", "tele", "radio"]
+    appareils = ["ordi", "smartphone", "tablette", "tele", "console", "enceinte_intel", "enceinte_classique", "hi_fi", "autoradio", "radio", "platine"]
+    moments = ["reveil/dormir", "preparation", "chemin", "activités", "voiture", "travail_etude", "cuisine_menage", "amis"]
+
+    df_musique_cleaned = df_musique_brut[variables_musique]
+
+    df_musique_cleaned.replace({"#NUL!": np.nan, "": np.nan, " ": np.nan}, inplace=True)
+    df_musique_cleaned = df_musique_cleaned.applymap(lambda x: x.strip() if isinstance(x, str) else x)  # retirer les espaces au début et à la fin des string pour le recodage au cas où
+
+    df_musique_recode = pd.DataFrame([])
+
+
+    sexe_map = {"FEMME": 1, "HOMME": 0}
+    df_musique_recode["sexe"] = df_musique_cleaned["QSEXE"].map(sexe_map)
+
+    df_musique_recode["15-24"] = np.where(
+        df_musique_cleaned["RAGE2"] == "De15a24ans", 1, 0)
+    df_musique_recode["25-34"] = np.where(
+        df_musique_cleaned["RAGE2"] == "De25a34ans1", 1, 0)
+    df_musique_recode["35-49"] = np.where(
+        df_musique_cleaned["RAGE2"] == "De35a49ans1", 1, 0)
+    df_musique_recode["50-64"] = np.where(
+        df_musique_cleaned["RAGE2"] == "De50a64ans1", 1, 0)
+    df_musique_recode["65-plus"] = np.where(
+        df_musique_cleaned["RAGE2"] == "De65aPlus", 1, 0)
+
+    agglo_map = {"MoinsDe100000Habitants": 0, "PlusDe100000Habitants": 1}
+    df_musique_recode["plusde100000hab"] = df_musique_cleaned["AGGLOIFOP2"].map(agglo_map)
+
+    idf_map = {"RegionIleDeFrance" :1, "PROVINCE":0}
+    df_musique_recode["idf"] = df_musique_cleaned["REG3"].map(idf_map)
+
+    df_musique_recode["region"]=df_musique_cleaned["REG13"]
+
+    df_musique_recode["csp_plus"] = np.where(
+        df_musique_cleaned["PI4"] == "CSPPLUS", 1, 0)
+    df_musique_recode["csp_moins"] = np.where(
+        df_musique_cleaned["PI4"] == "CSPMOINS", 1, 0)
+    df_musique_recode["csp_inact"] = np.where(
+        df_musique_cleaned["PI4"] == "INACTIFS", 1, 0)
+
+    df_musique_recode["usage_internet"]=df_musique_cleaned["QRS1"]
+
+
+
+    df_musique_recode[["conso_demat_mus", "conso_demat_films", "conso_demat_series", "conso_demat_photos", "conso_demat_jv", "conso_demat_livres", "conso_demat_logi", "conso_demat_presse", "conso_demat_retrans"]] = df_musique_cleaned[["Q1_1", "Q1_2", "Q1_3", "Q1_4", "Q1_5", "Q1_6", "Q1_7", "Q1_8", "Q1_9"]]
+    df_musique_recode[["conso_demat_mus", "conso_demat_films", "conso_demat_series", "conso_demat_photos", "conso_demat_jv", "conso_demat_livres", "conso_demat_logi", "conso_demat_presse", "conso_demat_retrans"]] = df_musique_recode[["conso_demat_mus", "conso_demat_films", "conso_demat_series", "conso_demat_photos", "conso_demat_jv", "conso_demat_livres", "conso_demat_logi", "conso_demat_presse", "conso_demat_retrans"]].applymap(lambda x: 1 if isinstance(x, str) and x.strip() != "" else 0)
+
+
+
+    df_musique_recode["freq_souvent"] = (
+        df_musique_cleaned["Q3"]
+        .isin(["Plusieurs fois par jour", "Tous les jours ou presque"])
+        .astype(int)
+    )
+    df_musique_recode["freq_occasionnel"] = (
+        df_musique_cleaned["Q3"]
+        .isin(["1 à 5 fois par semaine", "1 à 3 fois par mois"])
+        .astype(int)
+    )
+    df_musique_recode["freq_rare"] = (
+        df_musique_cleaned["Q3"]
+        .isin(["Moins souvent", "Jamais"])
+        .astype(int)
+    )
+
+    genres = ["var_fr", "poprock", "rap", "classique", "jazz", "dance", "electro", "metal", "rnb", "soul", "reggae", "musique_monde"]
+
+    df_musique_recode[genres] = df_musique_cleaned[["Q5_1", "Q5_2", "Q5_3", "Q5_4", "Q5_5", "Q5_6", "Q5_7", "Q5_8", "Q5_9", "Q5_10", "Q5_11", "Q5_12"]]
+    df_musique_recode[genres] = df_musique_recode[genres].applymap(lambda x: 1 if isinstance(x, str) and x.strip() != "" else 0)
+
+    df_musique_recode[mode_acces_musique] = df_musique_cleaned[["Q6_r1", "Q6_r2", "Q6_r3", "Q6_r4", "Q6_r5", "Q6_r6", "Q6_r7"]]
+
+    df_musique_recode["concerts_souvent"] = np.where(
+        df_musique_cleaned["Q7"] == "5 concerts/festivals ou plus", 1, 0)
+    df_musique_recode["concerts_occasionnel"] = (
+        df_musique_cleaned["Q7"]
+        .isin(["3 ou 4 concerts/festivals", "1 ou 2 concerts/festivals"])
+        .astype(int)
+    )
+    df_musique_recode["concerts_jamais"] = np.where(
+        df_musique_cleaned["Q7"] == "Aucun", 1, 0)
+
+    for i in range(len(appareils)):
+        df_musique_recode[f"{appareils[i]}"] = df_musique_cleaned[f"Q16_{i+1}"]
+
+    df_musique_recode["utilisation_max"] = df_musique_cleaned["Q17"]
+
+    for i in range(len(moments)):
+        df_musique_recode[f"{moments[i]}"] = df_musique_cleaned[f"Q18_{i+1}"]
+
+    for col in appareils: df_musique_recode[col] = np.where(df_musique_recode[col].notna() & (df_musique_recode[col] != 0), 1, 0) 
+    for col in moments: df_musique_recode[col] = np.where(df_musique_recode[col].notna() & (df_musique_recode[col] != 0), 1, 0)
+    
+    print(df_musique_recode.head())
+    return df_musique_recode
