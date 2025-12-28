@@ -222,6 +222,28 @@ def recodage_musique(df_musique_brut, variables_musique):
     df_musique_recode["65-plus"] = np.where(
         df_musique_cleaned["RAGE2"] == "De65aPlus", 1, 0)
 
+    df_musique_recode["ages_echelle"] = np.select(
+        [
+            df_musique_cleaned["RAGE2"].isin(
+                ["De15a24ans"]
+            ), 
+            df_musique_cleaned["RAGE2"].isin(
+                ["De25a34ans1"]
+            ),
+            df_musique_cleaned["RAGE2"].isin(
+                ["De35a49ans1"]
+            ),
+            df_musique_cleaned["RAGE2"].isin(
+                ["De50a64ans1"]
+            ),
+            df_musique_cleaned["RAGE2"].isin(
+                ["De65aPlus"]
+            )
+        ],
+        [1, 2, 3, 4, 5],
+        default=np.nan
+        )
+
     agglo_map = {"MoinsDe100000Habitants": 0, "PlusDe100000Habitants": 1}
     df_musique_recode["plusde100000hab"] = df_musique_cleaned["AGGLOIFOP2"].map(agglo_map)
 
@@ -236,6 +258,8 @@ def recodage_musique(df_musique_brut, variables_musique):
         df_musique_cleaned["PI4"] == "CSPMOINS", 1, 0)
     df_musique_recode["csp_inact"] = np.where(
         df_musique_cleaned["PI4"] == "INACTIFS", 1, 0)
+
+    df_musique_recode["csp"] = df_musique_cleaned["PI4"]
 
     df_musique_recode["usage_internet"]=df_musique_cleaned["QRS1"]
 
@@ -261,16 +285,25 @@ def recodage_musique(df_musique_brut, variables_musique):
     df_musique_recode["freq_ecoute"] = np.select(
         [
             df_musique_cleaned["Q3"].isin(
-                ["Plusieurs fois par jour", "Tous les jours ou presque"]
+                ["Plusieurs fois par jour"]
+            ), 
+            df_musique_cleaned["Q3"].isin(
+                ["Tous les jours ou presque"]
             ),
             df_musique_cleaned["Q3"].isin(
-                ["1 à 5 fois par semaine", "1 à 3 fois par mois"]
+                ["1 à 5 fois par semaine"]
             ),
             df_musique_cleaned["Q3"].isin(
-                ["Moins souvent", "Jamais"]
+                ["1 à 3 fois par mois"]
+            ),
+            df_musique_cleaned["Q3"].isin(
+                ["Moins souvent"]
+            ), 
+            df_musique_cleaned["Q3"].isin(
+                ["Jamais"]
             )
         ],
-        [3, 2, 1],
+        [6, 5, 4, 3, 2, 1],
         default=np.nan
         )
 
@@ -278,6 +311,25 @@ def recodage_musique(df_musique_brut, variables_musique):
     df_musique_recode[genres] = df_musique_recode[genres].applymap(lambda x: 1 if isinstance(x, str) and x.strip() != "" else 0)
 
     df_musique_recode[mode_acces_musique] = df_musique_cleaned[["Q6_r1", "Q6_r2", "Q6_r3", "Q6_r4", "Q6_r5", "Q6_r6", "Q6_r7"]]
+
+    df_musique_recode["concert"] = np.select(
+        [
+            df_musique_cleaned["Q7"].isin(
+                ["5 concerts/festivals ou plus"]
+            ), 
+            df_musique_cleaned["Q7"].isin(
+                ["3 ou 4 concerts/festivals"]
+            ),
+            df_musique_cleaned["Q7"].isin(
+                ["1 ou 2 concerts/festivals"]
+            ),
+            df_musique_cleaned["Q7"].isin(
+                ["Aucun"]
+            )
+        ],
+        [4, 3, 2, 1],
+        default=np.nan
+        )
 
     df_musique_recode["concerts_souvent"] = np.where(
         df_musique_cleaned["Q7"] == "5 concerts/festivals ou plus", 1, 0)
