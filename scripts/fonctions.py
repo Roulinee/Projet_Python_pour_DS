@@ -183,7 +183,7 @@ def recodage_barometre(df_barometre_brut, variables_barometre):
         df_barometre_cleaned["Q4"].isin(mix_legal)
     ).astype(int)
 
-    print(df_barometre_recode.describe())
+    df_barometre_recode.describe()
     return df_barometre_recode
 
 
@@ -302,5 +302,5 @@ def recodage_musique(df_musique_brut, variables_musique):
     
     df_musique_recode["poids"] = df_musique_brut["poids"]
 
-    print(df_musique_recode.describe())
+    df_musique_recode.describe()
     return df_musique_recode
