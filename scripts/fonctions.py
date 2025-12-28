@@ -61,6 +61,9 @@ def recodage_barometre(df_barometre_brut, variables_barometre):
     df_barometre_brut (DataFrame) : dataframe issu du téléchargement
     variables_barometre (List) : liste de variables
     """
+
+    pratiques = ["mus","films","series","photos","jv","livres","logi","presse","retrans"]
+
     df_barometre_cleaned = df_barometre_brut[variables_barometre]
 
     df_barometre_cleaned.replace({"#NUL!": np.nan, "": np.nan, " ": np.nan}, inplace=True)
@@ -77,9 +80,7 @@ def recodage_barometre(df_barometre_brut, variables_barometre):
     agglo_map = {"MoinsDe100000Habitants":0, "PlusDe100000Habitants":1}
     df_barometre_recode["plusde10000habitants"] = df_barometre_cleaned["AGGLOIFOP2"].map(agglo_map)
 
-
-    df_barometre_recode["commune_centreville"] = np.where(
-        df_barometre_cleaned["TYPCOM"] == "VilleCentre", 1, 0)
+    df_barometre_recode["commune_centreville"] = np.where(df_barometre_cleaned["TYPCOM"] == "VilleCentre", 1, 0)
 
     df_barometre_recode["commune_rural"] = np.where(
         df_barometre_cleaned["TYPCOM"] == "Rural", 1, 0)
@@ -95,7 +96,6 @@ def recodage_barometre(df_barometre_brut, variables_barometre):
 
     df_barometre_recode["commune_isolee"] = np.where(
         df_barometre_cleaned["TYPCOM"] == "VilleIsolee", 1, 0)
-
 
     df_barometre_recode["taille_commune"] = df_barometre_cleaned["TAILCOM"]
 
@@ -152,7 +152,6 @@ def recodage_barometre(df_barometre_brut, variables_barometre):
     df_barometre_recode["csp_inactifs_moins"] = np.where(
         df_barometre_cleaned["RECPPIA"] == "RetraitesCSPMoins", 1, 0)
 
-
     df_barometre_recode["foyer"] = df_barometre_cleaned["FOYER"]
 
     df_barometre_recode[["conso_demat_mus", "conso_demat_films", "conso_demat_series", "conso_demat_photos", "conso_demat_jv", "conso_demat_livres", "conso_demat_logi", "conso_demat_presse", "conso_demat_retrans"]] = df_barometre_cleaned[["Q1_1", "Q1_2", "Q1_3", "Q1_4", "Q1_5", "Q1_6", "Q1_7", "Q1_8", "Q1_9"]]
@@ -206,7 +205,6 @@ def recodage_musique(df_musique_brut, variables_musique):
 
     df_musique_recode = pd.DataFrame([])
 
-
     sexe_map = {"FEMME": 1, "HOMME": 0}
     df_musique_recode["sexe"] = df_musique_cleaned["QSEXE"].map(sexe_map)
 
@@ -238,12 +236,8 @@ def recodage_musique(df_musique_brut, variables_musique):
 
     df_musique_recode["usage_internet"]=df_musique_cleaned["QRS1"]
 
-
-
     df_musique_recode[["conso_demat_mus", "conso_demat_films", "conso_demat_series", "conso_demat_photos", "conso_demat_jv", "conso_demat_livres", "conso_demat_logi", "conso_demat_presse", "conso_demat_retrans"]] = df_musique_cleaned[["Q1_1", "Q1_2", "Q1_3", "Q1_4", "Q1_5", "Q1_6", "Q1_7", "Q1_8", "Q1_9"]]
     df_musique_recode[["conso_demat_mus", "conso_demat_films", "conso_demat_series", "conso_demat_photos", "conso_demat_jv", "conso_demat_livres", "conso_demat_logi", "conso_demat_presse", "conso_demat_retrans"]] = df_musique_recode[["conso_demat_mus", "conso_demat_films", "conso_demat_series", "conso_demat_photos", "conso_demat_jv", "conso_demat_livres", "conso_demat_logi", "conso_demat_presse", "conso_demat_retrans"]].applymap(lambda x: 1 if isinstance(x, str) and x.strip() != "" else 0)
-
-
 
     df_musique_recode["freq_souvent"] = (
         df_musique_cleaned["Q3"]
@@ -289,5 +283,7 @@ def recodage_musique(df_musique_brut, variables_musique):
     for col in appareils: df_musique_recode[col] = np.where(df_musique_recode[col].notna() & (df_musique_recode[col] != 0), 1, 0) 
     for col in moments: df_musique_recode[col] = np.where(df_musique_recode[col].notna() & (df_musique_recode[col] != 0), 1, 0)
     
+    df_musique_recode["poids"] = df_musique_brut["poids"]
+
     print(df_musique_recode.head())
     return df_musique_recode
