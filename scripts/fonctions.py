@@ -224,25 +224,15 @@ def recodage_musique(df_musique_brut, variables_musique):
 
     df_musique_recode["ages_echelle"] = np.select(
         [
-            df_musique_cleaned["RAGE2"].isin(
-                ["De15a24ans"]
-            ), 
-            df_musique_cleaned["RAGE2"].isin(
-                ["De25a34ans1"]
-            ),
-            df_musique_cleaned["RAGE2"].isin(
-                ["De35a49ans1"]
-            ),
-            df_musique_cleaned["RAGE2"].isin(
-                ["De50a64ans1"]
-            ),
-            df_musique_cleaned["RAGE2"].isin(
-                ["De65aPlus"]
-            )
+            df_musique_cleaned["RAGE2"] == "De15a24ans",
+            df_musique_cleaned["RAGE2"] == "De25a34ans1",
+            df_musique_cleaned["RAGE2"] == "De35a49ans1",
+            df_musique_cleaned["RAGE2"] == "De50a64ans1",
+            df_musique_cleaned["RAGE2"] == "De65aPlus"
         ],
         [1, 2, 3, 4, 5],
         default=np.nan
-        )
+    )
 
     agglo_map = {"MoinsDe100000Habitants": 0, "PlusDe100000Habitants": 1}
     df_musique_recode["plusde100000hab"] = df_musique_cleaned["AGGLOIFOP2"].map(agglo_map)
