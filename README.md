@@ -25,7 +25,7 @@ L’objectif est d’analyser la structure des consommations culturelles numéri
 
 Nous avons essentiellement utilisé deux base de données issues de l'Autorité de régulation de la communication audiovisuelle et numérique (Arcom). 
 
-Elles ont toutes les deux été publiées en 2020, et menées en 2019 par l'Ifop 
+Elles ont toutes les deux été menées en 2019 et publiées en 2020 par l'Ifop 
 
 - Pratiques d’écoute de musique en ligne - 2020 : https://www.data.gouv.fr/datasets/pratiques-decoute-de-musique-en-ligne-2020 (lien vers le site mettant à disposition les données)
 
