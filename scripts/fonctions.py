@@ -75,9 +75,11 @@ def recodage_barometre(df_barometre_brut, variables_barometre):
     sexe_map = {"Une femme": 1, "Un homme": 0}
     df_barometre_recode["sexe"] = df_barometre_cleaned["SEXE"].map(sexe_map)
 
-    df_barometre_recode["age"]=df_barometre_cleaned["AGE"]
+    df_barometre_recode["age"] = df_barometre_cleaned["AGE"]
 
-    agglo_map = {"MoinsDe100000Habitants":0, "PlusDe100000Habitants":1}
+    df_barometre_recode["trage"] = df_barometre_cleaned["RAGE2"]
+
+    agglo_map = {"MoinsDe100000Habitants": 0, "PlusDe100000Habitants": 1}
     df_barometre_recode["plusde10000habitants"] = df_barometre_cleaned["AGGLOIFOP2"].map(agglo_map)
 
     df_barometre_recode["commune_centreville"] = np.where(df_barometre_cleaned["TYPCOM"] == "VilleCentre", 1, 0)
