@@ -38,7 +38,7 @@ def analyser(df):
     n_const = (df.nunique(dropna=False) <= 1).sum()
 
     phrase = (
-        f"La base de données contient {n_obs} observations et {n_var} variables. \n"
+        f"\n La base de données contient {n_obs} observations et {n_var} variables. \n"
         f"Elle comprend {n_num} variables numériques, {n_txt} variables de type texte, \n"
         f"On observe {n_missing} valeurs manquantes, soit {pct_missing}% de l’ensemble des cellules, \n"
         f"réparties sur {n_var_missing} variables. \n"
@@ -160,6 +160,8 @@ def recodage_barometre(df_barometre_brut, variables_barometre):
     freq_map = {"Moins souvent": "Rare", "1 à 3 fois par mois": "Occasionnel", "1 à 5 fois par semaine": "Regulier", "Tous les jours ou presque": "Intensif"}
     df_barometre_recode[["freq_demat_mus", "freq_demat_films", "freq_demat_series", "freq_demat_photos", "freq_demat_jv", "freq_demat_livres", "freq_demat_logi", "freq_demat_presse", "freq_demat_retrans"]] = df_barometre_cleaned[["Q2_r1", "Q2_r2", "Q2_r3", "Q2_r4", "Q2_r5", "Q2_r6", "Q2_r7", "Q2_r8", "Q2_r9"]]
 
+    df_barometre_recode["diversite"] = df_barometre_recode[["conso_demat_mus", "conso_demat_films", "conso_demat_series", "conso_demat_photos", "conso_demat_jv", "conso_demat_livres", "conso_demat_logi", "conso_demat_presse", "conso_demat_retrans"]].sum(axis=1)
+
     for p in pratiques:
         df_barometre_recode[f"freq_demat_{p}"] = df_barometre_recode[f"freq_demat_{p}"].map(freq_map)
 
@@ -182,6 +184,18 @@ def recodage_barometre(df_barometre_brut, variables_barometre):
     df_barometre_recode["conso_legale_et_illegale"] = (
         df_barometre_cleaned["Q4"].isin(mix_legal)
     ).astype(int)
+
+    df_barometre_recode["indice_legalite"] = np.select(
+        [
+            df_barometre_cleaned["Q4"] == "Uniquement de manière légale",
+            df_barometre_cleaned["Q4"] == "Généralement de manière légale même s’il peut m’arriver de le faire de manière illégale",
+            df_barometre_cleaned["Q4"] == "Autant de manière légale qu’illégale",
+            df_barometre_cleaned["Q4"] == "Généralement de manière illégale même s’il peut m’arriver de le faire de manière légale",
+            df_barometre_cleaned["Q4"] == "Uniquement de manière illégale"
+        ],
+        [4, 3, 2, 1, 0],
+        default=np.nan
+    )
 
     df_barometre_recode.describe()
     return df_barometre_recode
