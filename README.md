@@ -8,6 +8,7 @@ Par _Morgane Ribeiro_ et _Juline Ley_, Décembre 2025
 * [Définition](#def)
 * [Objectif](#obj)
 * [Source des données](#source)
+* [Présentation du dépôt](#pres)
 * [Licence](#licence)
 
 ## Définitions <a class="anchor" id="def"></a>
@@ -34,6 +35,17 @@ La première base est issue d'une étude menée sur internet par l'Ifop en 2019.
 
 La seconde base de données est plus large et cible 9 contenus culturels et sportifs dématérialisés (musique, films, séries, photos, jeux vidéo, logiciels, livres numériques et audio, presse en ligne et retransmissions sportives en direct). Elle a été menée sur internet et par téléphone. La dernière mise à jour date du 3 avril 2025.
 
+## Présentation du dépot <a class="anchor" id="pres"></a>
+
+Le travail principal est présenté dans deux versions du fichier : ```main.ipynb```
+- ```main.ipynb``` est un jupyter notebook contenant le code non exécuté et les commentaires.
+- ```main(resultats).ipynb``` est un jupyter notebook contenant en plus du code et des commentaires, les résultats exécutés. Cette version est notre rendu final.
+
+Le dossier ```data``` contient une copie locale des deux bases de données utilisées.
+
+Le dossier ```scripts``` contient le fichier ```fonctions.py```, récapitulant toutes les fonctions que nous avons utilisées, par souci de lisibilité et de facilité de manipulation.
+
+Le fichier ```requirements.txt``` est exécuté par pip afin d'installer tous les paquets nécessaires pour exécuter le code.
 
 ## Licence <a class="anchor" id="licence"></a>
 
