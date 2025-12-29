@@ -37,7 +37,7 @@ La seconde base de données est plus large et cible 9 contenus culturels et spor
 
 ## Licence <a class="anchor" id="licence"></a>
 
-Les deux bases de données sont disponibles en licence ouverte, c'est à dire que nous avons le droit personnel, non exclusif et gratuit, de réutilisation de « l’Information » soumise à la présente licence, dans le monde entier et pour une durée illimitée, dans les libertés et les conditions exprimées ci-dessous.
+Les deux bases de données sont disponibles en licence ouverte, c'est à dire que nous avons « le droit personnel, non exclusif et gratuit, de réutilisation de « l’Information » soumise à la présente licence, dans le monde entier et pour une durée illimitée, dans les libertés et les conditions exprimées ci-dessous.
 Vous êtes libre de réutiliser « l’Information » :
 - Reproduire, copier, publier et transmettre « l’Information » ;
 - Diffuser et redistribuer « l’Information » ;
@@ -49,5 +49,7 @@ Sous réserve de :
 
 Le « Réutilisateur » peut notamment s’acquitter de cette condition en indiquant un ou des liens hypertextes (URL) renvoyant vers « l’Information » et assurant une mention effective de sa paternité.
 
-Cette mention de paternité ne doit ni conférer un caractère officiel à la réutilisation de « l’Information », ni suggérer une quelconque reconnaissance ou caution par le « Producteur », ou par toute autre entité publique, du « Réutilisateur » ou de sa réutilisation. 
+Cette mention de paternité ne doit ni conférer un caractère officiel à la réutilisation de « l’Information », ni suggérer une quelconque reconnaissance ou caution par le « Producteur », ou par toute autre entité publique, du « Réutilisateur » ou de sa réutilisation. »
+
+Source : https://www.etalab.gouv.fr/wp-content/uploads/2014/05/Licence_Ouverte.pdf 
 
