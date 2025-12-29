@@ -363,3 +363,15 @@ def recodage_musique(df_musique_brut, variables_musique):
 
     df_musique_recode.describe()
     return df_musique_recode
+
+
+def profil_categoriel(df, var):
+    tab = pd.pivot_table(
+        df,
+        values="poids",
+        index="classe",
+        columns=var,
+        aggfunc="sum",
+        fill_value=0
+    )
+    return tab.div(tab.sum(axis=1), axis=0) * 100
