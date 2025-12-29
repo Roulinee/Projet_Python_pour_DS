@@ -38,14 +38,14 @@ def analyser(df):
     n_const = (df.nunique(dropna=False) <= 1).sum()
 
     phrase = (
-        f"La base de données contient {n_obs} observations et {n_var} variables. \n"
+        f"\n La base de données contient {n_obs} observations et {n_var} variables. \n"
         f"Elle comprend {n_num} variables numériques, {n_txt} variables de type texte, \n"
         f"On observe {n_missing} valeurs manquantes, soit {pct_missing}% de l’ensemble des cellules, \n"
         f"réparties sur {n_var_missing} variables. \n"
         f"Enfin, {n_const} variables sont constantes. "
     )
 
-    return phrase
+    print(phrase)
 
 
 def ponderation_freq(series, weights):
@@ -160,6 +160,8 @@ def recodage_barometre(df_barometre_brut, variables_barometre):
     freq_map = {"Moins souvent": "Rare", "1 à 3 fois par mois": "Occasionnel", "1 à 5 fois par semaine": "Regulier", "Tous les jours ou presque": "Intensif"}
     df_barometre_recode[["freq_demat_mus", "freq_demat_films", "freq_demat_series", "freq_demat_photos", "freq_demat_jv", "freq_demat_livres", "freq_demat_logi", "freq_demat_presse", "freq_demat_retrans"]] = df_barometre_cleaned[["Q2_r1", "Q2_r2", "Q2_r3", "Q2_r4", "Q2_r5", "Q2_r6", "Q2_r7", "Q2_r8", "Q2_r9"]]
 
+    df_barometre_recode["diversite"] = df_barometre_recode[["conso_demat_mus", "conso_demat_films", "conso_demat_series", "conso_demat_photos", "conso_demat_jv", "conso_demat_livres", "conso_demat_logi", "conso_demat_presse", "conso_demat_retrans"]].sum(axis=1)
+
     for p in pratiques:
         df_barometre_recode[f"freq_demat_{p}"] = df_barometre_recode[f"freq_demat_{p}"].map(freq_map)
 
@@ -183,7 +185,19 @@ def recodage_barometre(df_barometre_brut, variables_barometre):
         df_barometre_cleaned["Q4"].isin(mix_legal)
     ).astype(int)
 
-    print(df_barometre_recode.head())
+    df_barometre_recode["indice_legalite"] = np.select(
+        [
+            df_barometre_cleaned["Q4"] == "Uniquement de manière légale",
+            df_barometre_cleaned["Q4"] == "Généralement de manière légale même s’il peut m’arriver de le faire de manière illégale",
+            df_barometre_cleaned["Q4"] == "Autant de manière légale qu’illégale",
+            df_barometre_cleaned["Q4"] == "Généralement de manière illégale même s’il peut m’arriver de le faire de manière légale",
+            df_barometre_cleaned["Q4"] == "Uniquement de manière illégale"
+        ],
+        [4, 3, 2, 1, 0],
+        default=np.nan
+    )
+
+    df_barometre_recode.describe()
     return df_barometre_recode
 
 
@@ -197,6 +211,7 @@ def recodage_musique(df_musique_brut, variables_musique):
     mode_acces_musique = ["internet", "applications", "CD", "vinyles", "concert", "tele", "radio"]
     appareils = ["ordi", "smartphone", "tablette", "tele", "console", "enceinte_intel", "enceinte_classique", "hi_fi", "autoradio", "radio", "platine"]
     moments = ["reveil/dormir", "preparation", "chemin", "activités", "voiture", "travail_etude", "cuisine_menage", "amis"]
+    genres = ["var_fr", "poprock", "rap", "classique", "jazz", "dance", "electro", "metal", "rnb", "soul", "reggae", "musique_monde"]
 
     df_musique_cleaned = df_musique_brut[variables_musique]
 
@@ -208,6 +223,8 @@ def recodage_musique(df_musique_brut, variables_musique):
     sexe_map = {"FEMME": 1, "HOMME": 0}
     df_musique_recode["sexe"] = df_musique_cleaned["QSEXE"].map(sexe_map)
 
+    df_musique_recode["age"] = df_musique_cleaned["RAGE2"]
+
     df_musique_recode["15-24"] = np.where(
         df_musique_cleaned["RAGE2"] == "De15a24ans", 1, 0)
     df_musique_recode["25-34"] = np.where(
@@ -218,6 +235,18 @@ def recodage_musique(df_musique_brut, variables_musique):
         df_musique_cleaned["RAGE2"] == "De50a64ans1", 1, 0)
     df_musique_recode["65-plus"] = np.where(
         df_musique_cleaned["RAGE2"] == "De65aPlus", 1, 0)
+
+    df_musique_recode["ages_echelle"] = np.select(
+        [
+            df_musique_cleaned["RAGE2"] == "De15a24ans",
+            df_musique_cleaned["RAGE2"] == "De25a34ans1",
+            df_musique_cleaned["RAGE2"] == "De35a49ans1",
+            df_musique_cleaned["RAGE2"] == "De50a64ans1",
+            df_musique_cleaned["RAGE2"] == "De65aPlus"
+        ],
+        [1, 2, 3, 4, 5],
+        default=np.nan
+    )
 
     agglo_map = {"MoinsDe100000Habitants": 0, "PlusDe100000Habitants": 1}
     df_musique_recode["plusde100000hab"] = df_musique_cleaned["AGGLOIFOP2"].map(agglo_map)
@@ -233,6 +262,8 @@ def recodage_musique(df_musique_brut, variables_musique):
         df_musique_cleaned["PI4"] == "CSPMOINS", 1, 0)
     df_musique_recode["csp_inact"] = np.where(
         df_musique_cleaned["PI4"] == "INACTIFS", 1, 0)
+
+    df_musique_recode["csp"] = df_musique_cleaned["PI4"]
 
     df_musique_recode["usage_internet"]=df_musique_cleaned["QRS1"]
 
@@ -255,12 +286,54 @@ def recodage_musique(df_musique_brut, variables_musique):
         .astype(int)
     )
 
-    genres = ["var_fr", "poprock", "rap", "classique", "jazz", "dance", "electro", "metal", "rnb", "soul", "reggae", "musique_monde"]
+    df_musique_recode["freq_ecoute"] = np.select(
+        [
+            df_musique_cleaned["Q3"].isin(
+                ["Plusieurs fois par jour"]
+            ), 
+            df_musique_cleaned["Q3"].isin(
+                ["Tous les jours ou presque"]
+            ),
+            df_musique_cleaned["Q3"].isin(
+                ["1 à 5 fois par semaine"]
+            ),
+            df_musique_cleaned["Q3"].isin(
+                ["1 à 3 fois par mois"]
+            ),
+            df_musique_cleaned["Q3"].isin(
+                ["Moins souvent"]
+            ), 
+            df_musique_cleaned["Q3"].isin(
+                ["Jamais"]
+            )
+        ],
+        [6, 5, 4, 3, 2, 1],
+        default=np.nan
+        )
 
     df_musique_recode[genres] = df_musique_cleaned[["Q5_1", "Q5_2", "Q5_3", "Q5_4", "Q5_5", "Q5_6", "Q5_7", "Q5_8", "Q5_9", "Q5_10", "Q5_11", "Q5_12"]]
     df_musique_recode[genres] = df_musique_recode[genres].applymap(lambda x: 1 if isinstance(x, str) and x.strip() != "" else 0)
 
     df_musique_recode[mode_acces_musique] = df_musique_cleaned[["Q6_r1", "Q6_r2", "Q6_r3", "Q6_r4", "Q6_r5", "Q6_r6", "Q6_r7"]]
+
+    df_musique_recode["concert"] = np.select(
+        [
+            df_musique_cleaned["Q7"].isin(
+                ["5 concerts/festivals ou plus"]
+            ), 
+            df_musique_cleaned["Q7"].isin(
+                ["3 ou 4 concerts/festivals"]
+            ),
+            df_musique_cleaned["Q7"].isin(
+                ["1 ou 2 concerts/festivals"]
+            ),
+            df_musique_cleaned["Q7"].isin(
+                ["Aucun"]
+            )
+        ],
+        [4, 3, 2, 1],
+        default=np.nan
+        )
 
     df_musique_recode["concerts_souvent"] = np.where(
         df_musique_cleaned["Q7"] == "5 concerts/festivals ou plus", 1, 0)
@@ -285,5 +358,5 @@ def recodage_musique(df_musique_brut, variables_musique):
     
     df_musique_recode["poids"] = df_musique_brut["poids"]
 
-    print(df_musique_recode.head())
+    df_musique_recode.describe()
     return df_musique_recode
