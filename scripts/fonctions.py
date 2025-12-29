@@ -38,11 +38,11 @@ def analyser(df):
     n_const = (df.nunique(dropna=False) <= 1).sum()
 
     phrase = (
-        f"\n La base de données contient {n_obs} observations et {n_var} variables. \n"
+        f"\nLa base de données contient {n_obs} observations et {n_var} variables. \n"
         f"Elle comprend {n_num} variables numériques, {n_txt} variables de type texte, \n"
         f"On observe {n_missing} valeurs manquantes, soit {pct_missing}% de l’ensemble des cellules, \n"
         f"réparties sur {n_var_missing} variables. \n"
-        f"Enfin, {n_const} variables sont constantes. "
+        f"Enfin, {n_const} variables sont constantes. \n "
     )
 
     print(phrase)
